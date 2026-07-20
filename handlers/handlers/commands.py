@@ -95,3 +95,19 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="Markdown",
             reply_markup=get_main_menu()
         )
+
+    elif data == "menu_help":
+        help_text = (
+            "🆘 *Help & Support*\n\n"
+            "Here are the available commands:\n"
+            "/start - Start the bot\n"
+            "/help - Show this help\n"
+            "/about - Learn more about the bot\n\n"
+            "📌 Tap any button to explore features!\n"
+            "🔙 Tap 'Main Menu' to go back."
+        )
+        await query.edit_message_text(
+            help_text,
+            parse_mode="Markdown",
+            reply_markup=get_main_menu()
+        )
