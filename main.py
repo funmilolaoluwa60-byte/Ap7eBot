@@ -1,14 +1,16 @@
+import os
 import logging
 import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# Set up logging
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+# Setup logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
 logger = logging.getLogger(__name__)
 
-# Bot token - get from environment
-import os
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # ── KEYBOARD ──
@@ -25,66 +27,104 @@ def get_main_menu():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-# ── COMMANDS ──
-async def start_command(update: Update, context):
+# ── COMMAND HANDLERS ──
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     welcome_text = (
         f"👋 Hello {user.first_name}!\n\n"
         "Welcome to @Ap7eBot — your personal assistant!\n\n"
         "📌 I can help you with:\n"
-        "• Daily tips\n"
-        "• Fun facts\n"
-        "• And more!\n\n"
-        "👇 Tap a button below!"
+        "• Daily tips and reminders\n"
+        "• Fun facts and inspiration\n"
+        "• Quick assistance\n\n"
+        "👇 Tap a button below to get started!"
     )
     await update.message.reply_text(welcome_text, reply_markup=get_main_menu())
 
-async def help_command(update: Update, context):
-    await update.message.reply_text(
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    help_text = (
         "🆘 *Help*\n\n"
+        "Available commands:\n"
         "/start - Start the bot\n"
         "/help - Show this help\n"
-        "/about - Learn about this bot",
-        parse_mode="Markdown"
+        "/about - Learn about this bot\n\n"
+        "💡 Tap any button to explore features!"
     )
+    await update.message.reply_text(help_text, parse_mode="Markdown")
 
-async def about_command(update: Update, context):
-    await update.message.reply_text(
-        "📖 *About*\n\n"
+async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    about_text = (
+        "📖 *About @Ap7eBot*\n\n"
         "A useful Telegram bot created with ❤️\n\n"
-        "🔹 No data is stored\n"
-        "🔹 Completely free to use",
-        parse_mode="Markdown"
+        "🔹 *Purpose:* Help users with daily tasks\n"
+        "🔹 *Privacy:* No data stored\n"
+        "🔹 *Free:* Completely free to use\n\n"
+        "Thank you for using @Ap7eBot! 🙌"
     )
+    await update.message.reply_text(about_text, parse_mode="Markdown")
 
 # ── BUTTON HANDLER ──
-async def button_callback(update: Update, context):
+async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    
     data = query.data
+    user = query.from_user
 
     if data == "menu_daily":
         await query.edit_message_text(
-            "📅 *Daily Tip*\n\nTake 5 minutes to plan your day!\n\n🔙 Tap 'Main Menu' to go back.",
+            f"📅 *Daily Tip for {user.first_name}*\n\n"
+            "✨ *Tip of the day:* Take 5 minutes to plan your day—it boosts productivity!\n\n"
+            "🔹 Break big tasks into small steps\n"
+            "🔹 Prioritize the most important task first\n"
+            "🔹 Stay hydrated and take short breaks\n\n"
+            "Come back tomorrow for a new tip! 🌟",
             parse_mode="Markdown",
             reply_markup=get_main_menu()
         )
+
     elif data == "menu_funfact":
-        facts = ["Octopuses have three hearts.", "Bananas are berries.", "Honey never spoils."]
+        fun_facts = [
+            "Octopuses have three hearts 🐙",
+            "Bananas are berries, but strawberries aren't 🍌",
+            "A day on Venus is longer than a year on Venus 🌌",
+            "Honey never spoils—archaeologists found 3000-year-old honey 🍯",
+            "The Eiffel Tower can grow 15 cm taller in summer 🗼"
+        ]
+        fact = random.choice(fun_facts)
         await query.edit_message_text(
-            f"🧠 *Fun Fact*\n\n{random.choice(facts)}\n\n🔙 Tap 'Main Menu' to go back.",
+            f"🧠 *Fun Fact for {user.first_name}*\n\n"
+            f"📌 {fact}\n\n"
+            "Tap below for more facts or return to the main menu! 🔄",
             parse_mode="Markdown",
             reply_markup=get_main_menu()
         )
+
     elif data == "menu_contact":
         await query.edit_message_text(
-            "📬 *Contact*\n\nEmail: support@example.com\n\n🔙 Tap 'Main Menu' to go back.",
+            "📬 *Contact & Support*\n\n"
+            "We're here to help! Here's how to reach us:\n\n"
+            "✉️ *Email:* support@ap7ebot.com\n"
+            "🐦 *Twitter:* @Ap7eBot\n\n"
+            "📌 *Feedback is always welcome!*\n"
+            "Tell us what features you'd like to see next.\n\n"
+            "🔙 Tap 'Main Menu' to go back.",
             parse_mode="Markdown",
             reply_markup=get_main_menu()
         )
+
     elif data == "menu_help":
+        help_text = (
+            "🆘 *Help & Support*\n\n"
+            "Here are the available commands:\n"
+            "/start - Start the bot\n"
+            "/help - Show this help\n"
+            "/about - Learn more about the bot\n\n"
+            "📌 Tap any button to explore features!\n"
+            "🔙 Tap 'Main Menu' to go back."
+        )
         await query.edit_message_text(
-            "🆘 *Help*\n\nCommands: /start, /help, /about\n\n🔙 Tap 'Main Menu' to go back.",
+            help_text,
             parse_mode="Markdown",
             reply_markup=get_main_menu()
         )
@@ -92,19 +132,23 @@ async def button_callback(update: Update, context):
 # ── MAIN ──
 def main():
     if not TOKEN:
-        logger.error("No token provided! Set TELEGRAM_BOT_TOKEN environment variable.")
+        logger.error("❌ No token provided! Set TELEGRAM_BOT_TOKEN environment variable.")
         return
+
+    logger.info("🚀 Starting @Ap7eBot...")
     
-    logger.info("Starting bot...")
-    app = ApplicationBuilder().token(TOKEN).build()
+    # Create application
+    application = Application.builder().token(TOKEN).build()
     
-    app.add_handler(CommandHandler("start", start_command))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("about", about_command))
-    app.add_handler(CallbackQueryHandler(button_callback))
+    # Add handlers
+    application.add_handler(CommandHandler("start", start_command))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("about", about_command))
+    application.add_handler(CallbackQueryHandler(button_callback))
     
-    logger.info("Bot is running!")
-    app.run_polling()
+    # Start the bot
+    logger.info("✅ Bot is running! Press Ctrl+C to stop.")
+    application.run_polling()
 
 if __name__ == "__main__":
     main()
