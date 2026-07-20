@@ -4,7 +4,6 @@ from keyboards.inline import get_main_menu
 
 # ── START COMMAND ──
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send a welcome message with inline keyboard when /start is issued."""
     user = update.effective_user
     welcome_text = (
         f"👋 Hello {user.first_name}!\n\n"
@@ -19,7 +18,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ── HELP COMMAND ──
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send a help message when /help is issued."""
     help_text = (
         "🆘 *How to use @Ap7eBot*\n\n"
         "Here are the available commands:\n"
@@ -33,7 +31,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ── ABOUT COMMAND ──
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send information about the bot when /about is issued."""
     about_text = (
         "📖 *About @Ap7eBot*\n\n"
         "This bot was created to provide quick and useful information right inside Telegram.\n\n"
@@ -46,7 +43,6 @@ async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ── BUTTON CALLBACK HANDLER ──
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle inline button presses."""
     query = update.callback_query
     await query.answer()
 
